@@ -14,7 +14,6 @@ const isDebugging = () => {
     // slowMo: 100,
     devtools: true,
   };
-  console.log(process.env.NODE_ENV);
   return process.env.NODE_ENV === 'debug' ? debugging_mode : {};
 }
 
@@ -22,20 +21,24 @@ const HOST = 'http://localhost:3000/';
 
 let browser;
 let page;
+let logs = [];
+let errors = [];
 beforeAll(async () => {
   browser = await puppeteer.launch(isDebugging());
   page = await browser.newPage();
+  page.on('console', c => logs.push(c.text()));
+  page.on('pagerror', e => errors.push(e.text()));
   page.setViewport({ width: 500, height: 2400 });
   await page.goto(HOST);
 });
 
 describe('on page load', () => {
-  xtest('h1 loads correctly ', async () => {
+  test('h1 loads correctly ', async () => {
     const html = await page.$eval('.App-title', e => e.innerHTML);
     expect(html).toBe('Welcome to React');
   }, 16000);
 
-  xtest('login form workds correctly', async () => {
+  test('login form workds correctly', async () => {
 
     await page.click('[data-testid="email"]');
     await page.type('[data-testid="email"]', user.email);
@@ -71,6 +74,16 @@ describe('on page load', () => {
     const cookies = await page.cookies();
     const emailCookie = cookies.find(c => c.name === 'email' && c.value === user.email);
     expect(emailCookie).not.toBeUndefined();
+  });
+
+  test('does not have any console logs or errors', () => {
+    const newLogs = logs.filter(log => log !== '%cDownload the React DevTools for a better development experience: https://fb.me/react-devtools font-weight:bold');
+    console.log(newLogs);
+    expect(newLogs.length).toBe(0);
+  });
+
+  test('does not have any exceptions', () => {
+    expect(errors.length).toBe(0);
   });
 });
 
