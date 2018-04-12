@@ -10,9 +10,9 @@ const user = {
 
 const isDebugging = () => {
   const debugging_mode = {
-    headless: true,
+    headless: false,
     // slowMo: 100,
-    devtools: true,
+    // devtools: true,
   };
   return process.env.NODE_ENV === 'debug' ? debugging_mode : {};
 }
@@ -43,12 +43,18 @@ beforeAll(async () => {
 });
 
 describe('on page load', () => {
-  test('h1 loads correctly ', async () => {
+  xtest('h1 loads correctly ', async () => {
     const html = await page.$eval('.App-title', e => e.innerHTML);
     expect(html).toBe('Welcome to React');
   }, 16000);
 
-  test('login form workds correctly', async () => {
+  xtest('take screenshot', async () => {
+    await page.emulate(iPhone);
+    const file = 'original.png';
+    await page.screenshot({ path: file });
+  });
+
+  xtest('login form workds correctly', async () => {
 
     await page.click('[data-testid="email"]');
     await page.type('[data-testid="email"]', user.email);
@@ -61,7 +67,7 @@ describe('on page load', () => {
 
   }, 16000);
 
-  test('phone login', async () => {
+  xtest('phone login', async () => {
     const iPhonePage = await browser.newPage();
     await iPhonePage.emulate(iPhone);
     await iPhonePage.goto(HOST);
@@ -80,22 +86,22 @@ describe('on page load', () => {
 
   }, 16000);
 
-  test('sets email cookie', async () => {
+  xtest('sets email cookie', async () => {
     const cookies = await page.cookies();
     const emailCookie = cookies.find(c => c.name === 'email' && c.value === user.email);
     expect(emailCookie).not.toBeUndefined();
   });
 
-  test('does not have any console logs or errors', () => {
+  xtest('does not have any console logs or errors', () => {
     const newLogs = logs.filter(log => log !== '%cDownload the React DevTools for a better development experience: https://fb.me/react-devtools font-weight:bold');
     expect(newLogs.length).toBe(0);
   });
 
-  test('does not have any exceptions', () => {
+  xtest('does not have any exceptions', () => {
     expect(errors.length).toBe(0);
   });
 
-  test('fails to fetch starwars api ', async () => {
+  xtest('fails to fetch starwars api ', async () => {
     const h3 = await page.$eval('[data-testid="starwars"]', e => e.innerHTML);
     expect(h3).toBe('Oops!');
   });
