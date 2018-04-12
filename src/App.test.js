@@ -26,6 +26,16 @@ let errors = [];
 beforeAll(async () => {
   browser = await puppeteer.launch(isDebugging());
   page = await browser.newPage();
+
+  await page.setRequestInterception(true);
+
+  page.on('request', request => {
+    if (request.url().includes('swapi')) {
+      request.abort();
+    } else {
+      request.continue();
+    }
+  });
   page.on('console', c => logs.push(c.text()));
   page.on('pagerror', e => errors.push(e.text()));
   page.setViewport({ width: 500, height: 2400 });
@@ -78,17 +88,20 @@ describe('on page load', () => {
 
   test('does not have any console logs or errors', () => {
     const newLogs = logs.filter(log => log !== '%cDownload the React DevTools for a better development experience: https://fb.me/react-devtools font-weight:bold');
-    console.log(newLogs);
     expect(newLogs.length).toBe(0);
   });
 
   test('does not have any exceptions', () => {
     expect(errors.length).toBe(0);
   });
+
+  test('fails to fetch starwars api ', async () => {
+    const h3 = await page.$eval('[data-testid="starwars"]', e => e.innerHTML);
+    expect(h3).toBe('Oops!');
+  });
 });
 
 afterAll(() => {
-  if (isDebugging()) {
+  if (browser)
     browser.close();
-  }
 })

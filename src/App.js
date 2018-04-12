@@ -6,8 +6,14 @@ import './App.css';
 class App extends Component {
   state = {
     complete: false,
-    email: ''
+    email: '',
+    starwars: {},
   };
+
+  async componentDidMount() {
+    const data = await fetch('https://swapi.com/api/people/1').then(res => res.json());
+    this.setState({ starwars: data });
+  }
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -18,7 +24,7 @@ class App extends Component {
   handleInput = (e) => {
     this.setState({ email: e.target.value });
   }
-  
+
   render() {
     return (
       <div className="App">
@@ -32,8 +38,9 @@ class App extends Component {
         {
           this.state.complete ?
             <p data-testid="success"> Logged In </p> :
-            <Login submit={this.handleSubmit} onChange={this.handleInput}/>
+            <Login submit={this.handleSubmit} onChange={this.handleInput} />
         }
+        <h3 data-testid="starwars">{this.state.starwars.url ? 'Long live and propsper!' : 'Oops!'}</h3>
       </div>
     );
   }
