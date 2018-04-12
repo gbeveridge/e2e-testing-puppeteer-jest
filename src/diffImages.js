@@ -13,7 +13,7 @@ exports.compareScreenshots = fileName => {
         null,
         img1.width,
         img1.height,
-        { threshold: 0.7 }
+        { threshold: 0.8 }
       );
 
       expect(numDiffPixel).toEqual(0);
