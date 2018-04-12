@@ -4,12 +4,21 @@ import Login from './Login';
 import './App.css';
 
 class App extends Component {
-  state = { complete: false };
+  state = {
+    complete: false,
+    email: ''
+  };
 
   handleSubmit = (e) => {
     e.preventDefault();
     this.setState({ complete: true });
+    document.cookie = `email=${this.state.email}`;
   }
+
+  handleInput = (e) => {
+    this.setState({ email: e.target.value });
+  }
+  
   render() {
     return (
       <div className="App">
@@ -23,7 +32,7 @@ class App extends Component {
         {
           this.state.complete ?
             <p data-testid="success"> Logged In </p> :
-            <Login submit={this.handleSubmit} />
+            <Login submit={this.handleSubmit} onChange={this.handleInput}/>
         }
       </div>
     );

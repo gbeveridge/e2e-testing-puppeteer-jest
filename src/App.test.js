@@ -10,8 +10,8 @@ const user = {
 
 const isDebugging = () => {
   const debugging_mode = {
-    headless: false,
-    slowMo: 100,
+    headless: true,
+    // slowMo: 100,
     devtools: true,
   };
   console.log(process.env.NODE_ENV);
@@ -30,12 +30,12 @@ beforeAll(async () => {
 });
 
 describe('on page load', () => {
-  test('h1 loads correctly ', async () => {
+  xtest('h1 loads correctly ', async () => {
     const html = await page.$eval('.App-title', e => e.innerHTML);
     expect(html).toBe('Welcome to React');
   }, 16000);
 
-  test('login form workds correctly', async () => {
+  xtest('login form workds correctly', async () => {
 
     await page.click('[data-testid="email"]');
     await page.type('[data-testid="email"]', user.email);
@@ -56,15 +56,22 @@ describe('on page load', () => {
     const email = await iPhonePage.$('[data-testid="email"]');
     const password = await iPhonePage.$('[data-testid="password"]');
     const submit = await iPhonePage.$('[data-testid="submit"]');
-    
+
     await email.tap();
     await iPhonePage.type('[data-testid="email"]', user.email);
 
     await password.tap();
     await iPhonePage.type('[data-testid="password"]', user.password);
 
+    await submit.tap();
 
   }, 16000);
+
+  test('sets email cookie', async () => {
+    const cookies = await page.cookies();
+    const emailCookie = cookies.find(c => c.name === 'email' && c.value === user.email);
+    expect(emailCookie).not.toBeUndefined();
+  });
 });
 
 afterAll(() => {
